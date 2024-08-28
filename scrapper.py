@@ -48,11 +48,12 @@ def execute_script():
 
         st.info("Getting download URL...")
         print(driver.find_element(By.XPATH, '//*[@id="tl-export-course"]').get_attribute('href'))
+        st.success(driver.find_element(By.XPATH, '//*[@id="tl-export-course"]').get_attribute('href'))
         download_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="tl-export-course"]')))
         download_button.click()
         time.sleep(5)
         download_url = driver.find_element(By.XPATH, '//*[@id="tl-export-course"]').get_attribute('href')
-        print(download_url)
+        st.success(download_url)
         cookies = driver.get_cookies()
         cookie_dict = {cookie['name']: cookie['value'] for cookie in cookies}
         st.success("Download URL obtained successfully.")
