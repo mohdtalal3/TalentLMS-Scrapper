@@ -47,6 +47,7 @@ def execute_script():
         st.success("Navigation complete.")
 
         st.info("Getting download URL...")
+        print(driver.find_element(By.XPATH, '//*[@id="tl-export-course"]').get_attribute('href'))
         download_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="tl-export-course"]')))
         download_button.click()
         time.sleep(5)
