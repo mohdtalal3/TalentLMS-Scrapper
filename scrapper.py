@@ -99,7 +99,7 @@ def execute_script():
         st.success("WebDriver closed successfully.")
 
 # Streamlit interface
-st.title("TalentLMS Script Execution")
+st.title("Execute TalentLMS Script")
 
-# Execute the script automatically
-execute_script()
+if st.button("Execute Script"):
+    execute_script()
