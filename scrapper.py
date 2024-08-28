@@ -94,7 +94,7 @@ def execute_script():
         st.error(f"An error occurred: {str(e)}")
 
     finally:
-        st.info("Closing WebDriver...")
+        st.info("Closing WebDriver....")
         driver.quit()
         st.success("WebDriver closed successfully.")
 
