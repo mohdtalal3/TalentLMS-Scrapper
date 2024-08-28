@@ -23,6 +23,7 @@ def execute_script():
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--window-size=1920,1080")
         driver = webdriver.Chrome(options=chrome_options)
         st.success("Chrome WebDriver initialized successfully.")
 
@@ -47,8 +48,6 @@ def execute_script():
         st.success("Navigation complete.")
 
         st.info("Getting download URL...")
-        print(driver.find_element(By.XPATH, '//*[@id="tl-export-course"]').get_attribute('href'))
-        st.success(driver.find_element(By.XPATH, '//*[@id="tl-export-course"]').get_attribute('href'))
         download_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="tl-export-course"]')))
         download_button.click()
         time.sleep(5)
