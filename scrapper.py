@@ -80,18 +80,18 @@ def execute_script():
                 date_fin_cours = row['Date de fin du cours']
                 temps = row['Temps']
                 note_moyenne = row['Note moyenne']
-                st.write(date_fin_cours,temps,note_moyenne)
-                # records = table.all(formula=f"{{Email}} = '{email}'")
-                # if records:
-                #     record_id = records[0]['id']
-                #     table.update(record_id, {
-                #         'Progress': statut,
-                #         'Date de mise à jour elearning': update_date,
-                #         'Date de fin du cours': date_fin_cours,
-                #         'Temps': temps,
-                #         'Note moyenne': note_moyenne
-                #     })
-                #     updated_records += 1
+                
+                records = table.all(formula=f"{{Email}} = '{email}'")
+                if records:
+                    record_id = records[0]['id']
+                    table.update(record_id, {
+                        'Progress': statut,
+                        'Date de mise à jour elearning': update_date,
+                        'Date de fin du cours': date_fin_cours,
+                        'Temps': temps,
+                        'Note moyenne': note_moyenne
+                    })
+                    updated_records += 1
 
             st.success(f"Script executed successfully. {updated_records} records updated in Airtable.")
 
