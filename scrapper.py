@@ -10,18 +10,12 @@ from datetime import datetime
 import pandas as pd
 from pyairtable import Table
 import io
-from datetime import datetime, timedelta
+
 # Airtable Configurations
 AIRTABLE_API_KEY = st.secrets["AIRTABLE_API_KEY"]
 BASE_ID = st.secrets["BASE_ID"]
 TABLE_NAME = st.secrets["TABLE_NAME"]
-def excel_date_to_iso(excel_date):
-    try:
-        excel_epoch = datetime(1899, 12, 30)
-        delta_days = timedelta(days=float(excel_date))
-        return excel_epoch + delta_days
-    except:
-        return None
+
 def execute_script():
     try:
         st.info("Initializing Chrome WebDriver...")
@@ -83,21 +77,17 @@ def execute_script():
                 update_date = datetime.now().strftime("%Y-%m-%d")
                 
                 # New fields
-                excel_datetime = excel_date_to_iso(row['Date de fin du cours'])
-                if excel_datetime:
-                    formatted_end_date = excel_datetime.strftime('%Y-%m-%d %H:%M:%S')
-                else:
-                    formatted_end_date = None
+                date_fin_cours = row['Date de fin du cours']
                 temps = row['Temps']
                 note_moyenne = row['Note moyenne']
-                st.write(formatted_end_date,temps,note_moyenne)
+                st.write(date_fin_cours,temps,note_moyenne)
                 # records = table.all(formula=f"{{Email}} = '{email}'")
                 # if records:
                 #     record_id = records[0]['id']
                 #     table.update(record_id, {
                 #         'Progress': statut,
                 #         'Date de mise à jour elearning': update_date,
-                #         'Date de fin du cours': formatted_end_date,
+                #         'Date de fin du cours': date_fin_cours,
                 #         'Temps': temps,
                 #         'Note moyenne': note_moyenne
                 #     })
