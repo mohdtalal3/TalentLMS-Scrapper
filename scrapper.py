@@ -8,8 +8,7 @@ from selenium.webdriver.chrome.options import Options
 import time
 from datetime import datetime
 import pandas as pd
-from pyairtable import Api, Table
-from pyairtable.formulas import match
+from pyairtable import Table, Api
 import io
 
 # Airtable Configurations
@@ -17,21 +16,29 @@ AIRTABLE_API_KEY = st.secrets["AIRTABLE_API_KEY"]
 BASE_ID = st.secrets["BASE_ID"]
 TABLE_NAME = st.secrets["TABLE_NAME"]
 
-# Function to create fields if they don't exist
-def create_fields_if_not_exist(api, base_id, table_name, fields):
-    table = api.table(base_id, table_name)
-    existing_fields = table.fields
+# Initialize Airtable API
+api = Api(AIRTABLE_API_KEY)
+table = Table(AIRTABLE_API_KEY, BASE_ID, TABLE_NAME)
 
-    for field in fields:
+# Function to check and create fields if they don't exist
+def ensure_fields_exist(base_id, table_name, new_fields):
+    base = api.base(base_id)
+    schema = base.get_table(table_name)['fields']
+    existing_fields = [field['name'] for field in schema]
+    
+    for field in new_fields:
         if field not in existing_fields:
-            try:
-                table.create_field(field, 'singleLineText')
-                st.success(f"Created new field: {field}")
-            except Exception as e:
-                st.warning(f"Failed to create field {field}: {str(e)}")
+            base.create_field(table_name, field, 'singleLineText')
+            st.success(f"Created new field: {field}")
+
+# New fields to add
+new_fields = ['Date de fin du cours', 'Temps', 'Note moyenne']
 
 def execute_script():
     try:
+        # Ensure new fields exist
+        ensure_fields_exist(BASE_ID, TABLE_NAME, new_fields)
+
         st.info("Initializing Chrome WebDriver...")
         chrome_options = Options()
         chrome_options.add_argument("--headless")
@@ -81,13 +88,7 @@ def execute_script():
             st.subheader("Downloaded Data:")
             st.dataframe(df)
 
-            st.info("Checking and creating Airtable fields if necessary...")
-            api = Api(AIRTABLE_API_KEY)
-            new_fields = ["Date de fin du cours", "Temps", "Note moyenne"]
-            create_fields_if_not_exist(api, BASE_ID, TABLE_NAME, new_fields)
-
             st.info("Updating Airtable records...")
-            table = Table(AIRTABLE_API_KEY, BASE_ID, TABLE_NAME)
 
             updated_records = 0
             for index, row in df.iterrows():
@@ -96,11 +97,11 @@ def execute_script():
                 update_date = datetime.now().strftime("%Y-%m-%d")
                 
                 # New fields
-                date_fin_cours = str(row['Date de fin du cours']) if pd.notnull(row['Date de fin du cours']) else None
-                temps = str(row['Temps']) if pd.notnull(row['Temps']) else None
-                note_moyenne = str(row['Note moyenne']) if pd.notnull(row['Note moyenne']) else None
+                date_fin_cours = row['Date de fin du cours']
+                temps = row['Temps']
+                note_moyenne = row['Note moyenne']
                 
-                records = table.all(formula=match({"Email": email}))
+                records = table.all(formula=f"{{Email}} = '{email}'")
                 if records:
                     record_id = records[0]['id']
                     table.update(record_id, {
