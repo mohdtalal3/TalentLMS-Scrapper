@@ -8,13 +8,23 @@ from selenium.webdriver.chrome.options import Options
 import time
 from datetime import datetime
 import pandas as pd
-from pyairtable import Table
+from pyairtable import Table, Api
+from pyairtable.formulas import match
 import io
 
 # Airtable Configurations
 AIRTABLE_API_KEY = st.secrets["AIRTABLE_API_KEY"]
 BASE_ID = st.secrets["BASE_ID"]
 TABLE_NAME = st.secrets["TABLE_NAME"]
+
+def create_fields_if_not_exist(api, base_id, table_name, fields):
+    table_schema = api.table(base_id, table_name).schema()
+    existing_fields = [field['name'] for field in table_schema['fields']]
+    
+    for field in fields:
+        if field not in existing_fields:
+            api.create_field(base_id, table_name, {'name': field, 'type': 'singleLineText'})
+            st.success(f"Created new field: {field}")
 
 def execute_script():
     try:
@@ -67,6 +77,11 @@ def execute_script():
             st.subheader("Downloaded Data:")
             st.dataframe(df)
 
+            st.info("Checking and creating Airtable fields if necessary...")
+            api = Api(AIRTABLE_API_KEY)
+            new_fields = ["Date de fin du cours", "Temps", "Note moyenne"]
+            create_fields_if_not_exist(api, BASE_ID, TABLE_NAME, new_fields)
+
             st.info("Updating Airtable records...")
             table = Table(AIRTABLE_API_KEY, BASE_ID, TABLE_NAME)
 
@@ -77,11 +92,11 @@ def execute_script():
                 update_date = datetime.now().strftime("%Y-%m-%d")
                 
                 # New fields
-                date_fin_cours = row['Date de fin du cours']
-                temps = row['Temps']
-                note_moyenne = row['Note moyenne']
+                date_fin_cours = str(row['Date de fin du cours']) if pd.notnull(row['Date de fin du cours']) else None
+                temps = str(row['Temps']) if pd.notnull(row['Temps']) else None
+                note_moyenne = str(row['Note moyenne']) if pd.notnull(row['Note moyenne']) else None
                 
-                records = table.all(formula=f"{{Email}} = '{email}'")
+                records = table.all(formula=match({"Email": email}))
                 if records:
                     record_id = records[0]['id']
                     table.update(record_id, {
