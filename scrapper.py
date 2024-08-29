@@ -9,6 +9,7 @@ import time
 from datetime import datetime
 import pandas as pd
 from pyairtable import Table, Api
+from pyairtable.formulas import match
 import io
 
 # Airtable Configurations
@@ -20,16 +21,29 @@ TABLE_NAME = st.secrets["TABLE_NAME"]
 api = Api(AIRTABLE_API_KEY)
 table = Table(AIRTABLE_API_KEY, BASE_ID, TABLE_NAME)
 
-# Function to check and create fields if they don't exist
-def ensure_fields_exist(base_id, table_name, new_fields):
-    base = api.base(base_id)
-    schema = base.get_table(table_name)['fields']
-    existing_fields = [field['name'] for field in schema]
-    
+def ensure_fields_exist(base_id, table_id, new_fields):
+    url = f"https://api.airtable.com/v0/meta/bases/{base_id}/tables/{table_id}/fields"
+    headers = {
+        "Authorization": f"Bearer {AIRTABLE_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    existing_fields = table.fields
+
     for field in new_fields:
         if field not in existing_fields:
-            base.create_field(table_name, field, 'singleLineText')
-            st.success(f"Created new field: {field}")
+            payload = {
+                "name": field,
+                "type": "singleLineText",
+                "description": f"Automatically created field for {field}"
+            }
+            
+            response = requests.post(url, headers=headers, json=payload)
+            
+            if response.status_code == 200:
+                st.success(f"Created new field: {field}")
+            else:
+                st.warning(f"Could not create field {field}. Status code: {response.status_code}, Response: {response.text}")
 
 # New fields to add
 new_fields = ['Date de fin du cours', 'Temps', 'Note moyenne']
@@ -101,7 +115,7 @@ def execute_script():
                 temps = row['Temps']
                 note_moyenne = row['Note moyenne']
                 
-                records = table.all(formula=f"{{Email}} = '{email}'")
+                records = table.all(formula=match({"Email": email}))
                 if records:
                     record_id = records[0]['id']
                     table.update(record_id, {
@@ -123,7 +137,8 @@ def execute_script():
 
     finally:
         st.info("Closing WebDriver....")
-        driver.quit()
+        if 'driver' in locals():
+            driver.quit()
         st.success("WebDriver closed successfully.")
 
 # Streamlit interface
