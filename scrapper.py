@@ -8,7 +8,7 @@ from selenium.webdriver.chrome.options import Options
 import time
 from datetime import datetime
 import pandas as pd
-from pyairtable import Table, Api
+from pyairtable import Api, Table
 from pyairtable.formulas import match
 import io
 
@@ -17,14 +17,18 @@ AIRTABLE_API_KEY = st.secrets["AIRTABLE_API_KEY"]
 BASE_ID = st.secrets["BASE_ID"]
 TABLE_NAME = st.secrets["TABLE_NAME"]
 
+# Function to create fields if they don't exist
 def create_fields_if_not_exist(api, base_id, table_name, fields):
-    table_schema = api.table(base_id, table_name).schema()
-    existing_fields = [field['name'] for field in table_schema['fields']]
-    
+    table = api.table(base_id, table_name)
+    existing_fields = table.fields
+
     for field in fields:
         if field not in existing_fields:
-            api.create_field(base_id, table_name, {'name': field, 'type': 'singleLineText'})
-            st.success(f"Created new field: {field}")
+            try:
+                table.create_field(field, 'singleLineText')
+                st.success(f"Created new field: {field}")
+            except Exception as e:
+                st.warning(f"Failed to create field {field}: {str(e)}")
 
 def execute_script():
     try:
