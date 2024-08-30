@@ -71,6 +71,7 @@ def execute_script():
             table = Table(AIRTABLE_API_KEY, BASE_ID, TABLE_NAME)
 
             updated_records = 0
+            data = []
             for index, row in df.iterrows():
                 email = row['Email']
                 statut = str(row['Statut']).strip()
@@ -83,13 +84,16 @@ def execute_script():
                 
                 records = table.all(formula=f"{{Email}} = '{email}'")
                 if records:
+                    data.append(records['fields'])
+                    df = pd.DataFrame(data)
+            
+                    st.subheader("All Airtable Data:")
+                    st.dataframe(df)
                     record_id = records[0]['id']
                     table.update(record_id, {
                         'Progress': statut,
                         'Date de mise à jour elearning': update_date,
-                        'Date de fin du cours': date_fin_cours,
-                        'Temps': temps,
-                        'Note moyenne': note_moyenne
+                        'Temps elearning': temps,
                     })
                     updated_records += 1
 
