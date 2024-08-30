@@ -80,13 +80,19 @@ def execute_script():
                 # # New fields
                 date_fin_cours = row['Date de fin du cours']
                 if date_fin_cours and date_fin_cours != '-':
-                    try:
-                        # Parse the string to a datetime object
-                        parsed_date = datetime.strptime(date_fin_cours, "%Y-%m-%d %H:%M:%S")
-                        # Keep the full format
-                        date_fin_cours = parsed_date.strftime("%Y-%m-%d %H:%M:%S")
-                    except ValueError:
-                        # If parsing fails, set to None
+                    if isinstance(date_fin_cours, datetime):
+                        # It's already a datetime object, just format it
+                        date_fin_cours = date_fin_cours.strftime("%Y-%m-%d %H:%M:%S")
+                    elif isinstance(date_fin_cours, str):
+                        try:
+                            # Parse the string to a datetime object
+                            parsed_date = datetime.strptime(date_fin_cours, "%Y-%m-%d %H:%M:%S")
+                            date_fin_cours = parsed_date.strftime("%Y-%m-%d %H:%M:%S")
+                        except ValueError:
+                            # If parsing fails, set to None
+                            date_fin_cours = None
+                    else:
+                        # If it's neither a datetime nor a string, set to None
                         date_fin_cours = None
                 else:
                     date_fin_cours = None
