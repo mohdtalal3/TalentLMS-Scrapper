@@ -82,12 +82,12 @@ def execute_script():
                 if date_fin_cours and date_fin_cours != '-':
                     if isinstance(date_fin_cours, datetime):
                         # It's already a datetime object, just format it
-                        date_fin_cours = date_fin_cours.strftime("%Y-%m-%d %H:%M:%S")
+                        date_fin_cours = date_fin_cours.strftime("%Y-%m-%d")
                     elif isinstance(date_fin_cours, str):
                         try:
                             # Parse the string to a datetime object
-                            parsed_date = datetime.strptime(date_fin_cours, "%Y-%m-%d %H:%M:%S")
-                            date_fin_cours = parsed_date.strftime("%Y-%m-%d %H:%M:%S")
+                            parsed_date = datetime.strptime(date_fin_cours, "%Y-%m-%d")
+                            date_fin_cours = parsed_date.strftime("%Y-%m-%d")
                         except ValueError:
                             # If parsing fails, set to None
                             date_fin_cours = None
