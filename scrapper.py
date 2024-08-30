@@ -79,6 +79,17 @@ def execute_script():
                 
                 # # New fields
                 date_fin_cours = row['Date de fin du cours']
+                if date_fin_cours and date_fin_cours != '-':
+                    try:
+                        # Parse the string to a datetime object
+                        parsed_date = datetime.strptime(date_fin_cours, "%Y-%m-%d %H:%M:%S")
+                        # Keep the full format
+                        date_fin_cours = parsed_date.strftime("%Y-%m-%d %H:%M:%S")
+                    except ValueError:
+                        # If parsing fails, set to None
+                        date_fin_cours = None
+                else:
+                    date_fin_cours = None
                 temps = row['Temps']
                 note_moyenne = row['Note moyenne']
                 
