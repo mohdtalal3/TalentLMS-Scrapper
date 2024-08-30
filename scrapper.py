@@ -78,19 +78,21 @@ def execute_script():
                 update_date = datetime.now().strftime("%Y-%m-%d")
                 
                 # # New fields
-                # date_fin_cours = row['Date de fin du cours']
+                date_fin_cours = row['Date de fin du cours']
                 temps = row['Temps']
-                # note_moyenne = row['Note moyenne']
+                note_moyenne = row['Note moyenne']
                 
                 records = table.all(formula=f"{{Email}} = '{email}'")
                 if records:
-                    st.write(records)
-                    st.write(records[0]['id'])
+                    # st.write(records)
+                    # st.write(records[0]['id'])
                     record_id = records[0]['id']
                     table.update(record_id, {
                         'Progress': statut,
                         'Date de mise à jour elearning': update_date,
                         'Temps elearning': temps,
+                        'Note moy. elearning':note_moyenne,
+                        'Date de fin elearning':date_fin_cours
                     })
                     updated_records += 1
 
