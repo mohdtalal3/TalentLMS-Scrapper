@@ -77,10 +77,10 @@ def execute_script():
                 statut = str(row['Statut']).strip()
                 update_date = datetime.now().strftime("%Y-%m-%d")
                 
-                # New fields
-                date_fin_cours = row['Date de fin du cours']
+                # # New fields
+                # date_fin_cours = row['Date de fin du cours']
                 temps = row['Temps']
-                note_moyenne = row['Note moyenne']
+                # note_moyenne = row['Note moyenne']
                 
                 records = table.all(formula=f"{{Email}} = '{email}'")
                 if records:
