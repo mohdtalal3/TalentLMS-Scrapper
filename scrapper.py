@@ -84,11 +84,8 @@ def execute_script():
                 
                 records = table.all(formula=f"{{Email}} = '{email}'")
                 if records:
-                    data.append(records['fields'])
-                    df = pd.DataFrame(data)
-            
-                    st.subheader("All Airtable Data:")
-                    st.dataframe(df)
+                    st.write(records)
+                    st.write(records[0]['id'])
                     record_id = records[0]['id']
                     table.update(record_id, {
                         'Progress': statut,
