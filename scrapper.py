@@ -10,18 +10,31 @@ from datetime import datetime
 import pandas as pd
 from pyairtable import Table
 import io
-
+counter=False
 # Airtable Configurations
 AIRTABLE_API_KEY = st.secrets["AIRTABLE_API_KEY"]
 BASE_ID = st.secrets["BASE_ID"]
 TABLE_NAME = st.secrets["TABLE_NAME"]
 
+
+def login_in_link(driver):
+    wait = WebDriverWait(driver, 10)
+    username = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@name='login']")))
+    password = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@name='password']")))
+    username.send_keys(st.secrets["TALENTLMS_USERNAME"])
+    password.send_keys(st.secrets["TALENTLMS_PASSWORD"])
+    login_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@name='submit']")))
+    login_button.click()
+    global counter
+    counter=True
 def process_course(driver, wait, course_id):
     st.info(f"Navigating to course page {course_id}...")
     driver.get(f'https://espaceformations-monparcoursenligne.talentlms.com/reports/courseinfo/id:{course_id}')
     time.sleep(5)
     st.success("Navigation complete.")
-
+    global counter
+    if counter==False:
+        login_in_link(driver)
     st.info("Getting download URL...")
     download_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="tl-export-course"]')))
     download_button.click()
@@ -62,13 +75,12 @@ def execute_script():
         driver.get('https://espaceformations-monparcoursenligne.talentlms.com/')
         wait = WebDriverWait(driver, 10)
         st.success("TalentLMS accessed successfully.")
-
         st.info("Logging in...")
-        username = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'input[name="login"]')))
-        password = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'input[name="password"]')))
+        username = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@id='username']")))
+        password = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@id='password']")))
         username.send_keys(st.secrets["TALENTLMS_USERNAME"])
         password.send_keys(st.secrets["TALENTLMS_PASSWORD"])
-        login_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'input[type="submit"]')))
+        login_button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@type='submit']")))
         login_button.click()
         time.sleep(5)
         st.success("Logged in successfully.")
