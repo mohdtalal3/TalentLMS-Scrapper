@@ -11,7 +11,7 @@ import pandas as pd
 from pyairtable import Table
 import io
 counter=False
-# Airtable Configurations
+# Airtable Configurationss
 AIRTABLE_API_KEY = st.secrets["AIRTABLE_API_KEY"]
 BASE_ID = st.secrets["BASE_ID"]
 TABLE_NAME = st.secrets["TABLE_NAME"]
@@ -32,9 +32,9 @@ def process_course(driver, wait, course_id):
     driver.get(f'https://espaceformations-monparcoursenligne.talentlms.com/reports/courseinfo/id:{course_id}')
     time.sleep(5)
     st.success("Navigation complete.")
-    global counter
-    if counter==False:
-        login_in_link(driver)
+    # global counter
+    # if counter==False:
+    #     login_in_link(driver)
     st.info("Getting download URL...")
     download_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="tl-export-course"]')))
     download_button.click()
