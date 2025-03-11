@@ -11,7 +11,7 @@ import pandas as pd
 from pyairtable import Table
 import io
 counter=False
-# Airtable Configurationss
+# Airtable Configurationsss
 AIRTABLE_API_KEY = st.secrets["AIRTABLE_API_KEY"]
 BASE_ID = st.secrets["BASE_ID"]
 TABLE_NAME = st.secrets["TABLE_NAME"]
