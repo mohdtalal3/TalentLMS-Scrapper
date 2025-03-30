@@ -75,7 +75,7 @@ def execute_script():
         wait = WebDriverWait(driver, 10)
         st.success("TalentLMS accessed successfully.")
         st.info("Logging in...")
-        username = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@name='login']")))
+        username = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@name='logn']")))
         password = wait.until(EC.presence_of_element_located((By.XPATH, "//input[@name='password']")))
         username.send_keys(st.secrets["TALENTLMS_USERNAME"])
         password.send_keys(st.secrets["TALENTLMS_PASSWORD"])
